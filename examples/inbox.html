@@ -1,0 +1,250 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet"
+        integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC" crossorigin="anonymous">
+    <link rel="icon" type="image/png" href="/images/favicon.png">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+    <title>Indigitall JS Examples</title>
+</head>
+
+<style>
+    ul {
+        list-style: none;
+    }
+</style>
+
+<body>
+    <div id="root">
+        <nav class="navbar navbar-expand-sm navbar-dark bg-dark">
+            <div class="container">
+                <a href="/#" class="navbar-brand mb-0 h1">
+                    <button type="button" class="btn btn-light">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor"
+                            class="bi bi-chevron-left" viewBox="0 0 16 16">
+                            <path fill-rule="evenodd"
+                                d="M11.354 1.646a.5.5 0 0 1 0 .708L5.707 8l5.647 5.646a.5.5 0 0 1-.708.708l-6-6a.5.5 0 0 1 0-.708l6-6a.5.5 0 0 1 .708 0z" />
+                        </svg>
+                    </button>
+                    Indigitall Examples - Inbox
+                </a>
+            </div>
+        </nav>
+        <div id="main-page" style="margin: 16px;">
+            <div>
+                Unread inbox count: <div class="inbox-count-txt" id="NewPush"></div>
+            </div>
+            <div style="background-color: white">
+                <table style="width:100%;margin-top:30px">
+                    <tr>
+                        <td style="width:20%">
+                            <button class="btn" style="float: left;margin-left: 20px;max-width: 65px;">
+                                <i class="fas fa-pen-square" id="edit_externalId" title="Edit External Id">
+                                    <span style="font-size:30px;cursor:pointer"> </span>
+                                </i>
+                            </button>
+                        </td>
+                        <td style="width:20%">
+                            <button class="btn" style="margin-left: 20px;max-width: 65px;">
+                                <i class="fa fa-envelope-open" id="markAsRead">
+                                    <span style="font-size:30px;cursor:pointer"> </span>
+                                </i>
+                            </button>
+                        </td>
+                        <td style="width:20%">
+                            <button class="btn" style="max-width: 65px;">
+                                <i class="fa fa-trash" id="btnDeleteNotification">
+                                    <span style="font-size:30px;cursor:pointer"></span>
+                                </i>
+                            </button>
+                        </td>
+                        <td style="width:40%;text-align:right">
+                            <button class="btn" style="width:30%;max-width: 65px;">
+                                <i class="fa fa-angle-double-right" id="getNextPage">
+                                    <span style="font-size:30px;cursor:pointer"></span>
+                                </i>
+                            </button>
+                        </td>
+                    </tr>
+                </table>
+                <div id="pagination_inbox" class="pagination_inbox" style="float:left;"></div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.bundle.min.js"
+        integrity="sha384-MrcW6ZMFYlzcLA8Nl+NtUVF0sA7MsXsP1UyJoMp4YLEuNSfAP+JcXn/tWtIaxVXM"
+        crossorigin="anonymous"></script>
+        <script src="/indigitall/sdk.min.js"></script>
+    <script>
+        // Init
+        document.getElementById("markAsRead").addEventListener("click", markAsRead, false);
+        document.getElementById("btnDeleteNotification").addEventListener("click", deleteNotification, false);
+        document.getElementById("getNextPage").addEventListener("click", getInboxNextPage, false);
+
+        // Variables
+        var thisInbox;
+        var notificationsInbox = [];
+        var notificationsSelected = [];
+        var inboxTotalPushes = 0;
+        // CONST
+        const MY_DEVICE_ID = "MY_DEVICE_ID"
+
+        // Functions
+        function inboxLogin() {
+            indigitall.logIn(MY_DEVICE_ID, (device) => {
+                console.log("login ok");
+                getInboxCount();
+                loadInbox();
+            }, (error) => {
+                //LOG ERROR
+            });
+        }
+        function getInboxCount() {
+            var newPush = document.getElementById("NewPush");
+            indigitall.getInboxMessagesCount(MY_DEVICE_ID, (counter) => {
+                console.log("counters ", counter);
+                inboxTotalPushes = counter.click + counter.sent;
+                newPush.innerHTML = counter.unread.count;
+            }, (error) => {
+                console.log("error counter inbox ", error);
+                newPush.innerHTML = "?";
+            });
+        }
+
+        function setInbox(inbox) {
+            var allNotifications = [];
+            for (var i = 0; i < inbox.notifications.length; i++) {
+                var notifications = inbox.notifications[i];
+                var type = "";
+                if (!notifications.read) {
+                    type = "unread";
+                }
+                var a = document.createElement("a");
+                var image = notifications.message.image;
+                var htmlImage = "";
+                if (image) {
+                    htmlImage = `${notifications.message.image}`;
+                } else {
+                    htmlImage = `./img/unimage.png`;
+                }
+                a.innerHTML =
+                    `<div id="${notifications.sendingId}" class="inbox_container" >
+                    <div style="float:left" >
+                        <table class="${type}" border="0" width="500px">
+                            <tr >
+                                <td ROWSPAN="3" width="80px"><img src="${htmlImage}" alt="Avatar" ></td>
+                            </tr>
+                            <tr>
+                                <td >${notifications.message.title}</td>
+                            </tr>
+                            <tr>
+                                <td>${notifications.message.body}</td>                                        
+                                
+                            </tr>
+                        </table>
+                    </div>
+                    <div style="float:right"><input type="checkbox" width="30px" id="myCheck${notifications.sendingId}" style="cursor:pointer;"></div>
+            </div>`;
+
+                var myInbox = document.getElementById("InboxIndigitall");
+                myInbox.appendChild(a);
+                allNotifications.push(`myCheck${notifications.sendingId}`);
+            }
+            for (var i = 0; i < allNotifications.length; i++) {
+                document.getElementById(allNotifications[i]).onclick = function () {
+                    checkedNotification(this.id.replace("myCheck", ""), this.checked);
+                };
+            }
+        }
+
+
+        function loadInbox() {
+            if (inboxTotalPushes != 0) {
+                indigitall.getInbox(MY_DEVICE_ID, inbox => {
+                    thisInbox = inbox;
+                    if (inbox != null) {
+                        notificationsInbox = notificationsInbox.concat(inbox.notifications);
+                        setInbox(inbox);
+                        console.log(inbox);
+                    }
+
+                }, (error) => {
+                    console.log("Error loading Inbox: ", error);
+                });
+            }
+        }
+
+        function getInboxNextPage() {
+            thisInbox.getNextPage((inbox, newNotifications) => {
+                console.log("newNotifications", newNotifications);
+                setInbox(inbox);
+            }, (error) => {
+                if (error.errorCode == 410) {
+                    console.log("Last page");
+                } else {
+                    console.log(error);
+                }
+            });
+        }
+
+        function deleteNotification() {
+            if (notificationsSelected != null && notificationsSelected.length > 0) {
+                thisInbox.massiveEditNotifications(notificationsSelected, inboxStatus.DELETED, () => {
+                    for (var i = 0; i < notificationsSelected.length; i++) {
+                        document.getElementById(notificationsSelected[i]).remove();
+                        const index = notificationsSelected.indexOf(notificationsSelected[i]);
+                        if (index > -1) {
+                            notificationsSelected.splice(index, 1);
+                        }
+                    }
+                }, (error) => {
+                    console.log("error deleting inbox", error);
+                });
+            }
+            for (var i = 0; i < notificationsSelected.length; i++) {
+                var checkBox = document.getElementById(`myCheck${notificationsSelected[i]}`);
+                checkBox.checked = false;
+            }
+            notificationsSelected.pop();
+        }
+
+        function markAsRead() {
+            if (notificationsSelected != null && notificationsSelected.length > 0) {
+                thisInbox.massiveEditNotifications(notificationsSelected, inboxStatus.CLICK, () => {
+                }, (error) => {
+                    console.log("error editing inbox", error);
+                });
+            } else {
+                console.log("No notifications remaining");
+            }
+            for (var i = 0; i < notificationsSelected.length; i++) {
+                var checkBox = document.getElementById(`myCheck${notificationsSelected[i]}`);
+                checkBox.checked = false;
+            }
+
+        }
+
+        function checkedNotification(sendingId, checked) {
+            if (checked) {
+                notificationsSelected.push(sendingId);
+            } else {
+                const index = notificationsSelected.indexOf(sendingId);
+                if (index > -1) {
+                    notificationsSelected.splice(index, 1);
+                }
+
+            }
+        }
+
+
+        //
+        inboxLogin();    
+    </script>
+
+</body>
+
+</html>

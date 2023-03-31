@@ -1,0 +1,83 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet"
+        integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC" crossorigin="anonymous">
+    <link rel="icon" type="image/png" href="/images/favicon.png">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+    <title>Indigitall JS Examples</title>
+</head>
+
+<style>
+    ul {
+        list-style: none;
+    }
+</style>
+
+<body>
+    <div id="root">
+        <nav class="navbar navbar-expand-sm navbar-dark bg-dark">
+            <div class="container">
+                <a href="/#" class="navbar-brand mb-0 h1">
+                    <button type="button" class="btn btn-light">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor"
+                            class="bi bi-chevron-left" viewBox="0 0 16 16">
+                            <path fill-rule="evenodd"
+                                d="M11.354 1.646a.5.5 0 0 1 0 .708L5.707 8l5.647 5.646a.5.5 0 0 1-.708.708l-6-6a.5.5 0 0 1 0-.708l6-6a.5.5 0 0 1 .708 0z" />
+                        </svg>
+                    </button>
+                    Indigitall Examples - InApp
+                </a>
+            </div>
+        </nav>
+        <div id="main-page" style="margin: 16px;">
+            <div>
+                <table>
+                    <tr>
+                        <td style="padding: 16px;">
+                            <p>Banner 1 (250x250):</p>
+                            <div id="divView" style="width:250px; height:250px;"></div>
+                        </td>
+                        <td style="padding: 16px;">
+                            <p>Banner 2 (500x500):</p>
+                            <div id="divViewTwo" style="width:500px; height:500px;"></div>
+                        </td>
+                    </tr>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.bundle.min.js"
+        integrity="sha384-MrcW6ZMFYlzcLA8Nl+NtUVF0sA7MsXsP1UyJoMp4YLEuNSfAP+JcXn/tWtIaxVXM"
+        crossorigin="anonymous"></script>
+    <script src="/indigitall/sdk.min.js"></script>
+    <script>
+        function getInApp() {
+            let inAppCodeList = [];
+            inAppCodeList.push("INAPP-SCHEMA-CODE1");
+            inAppCodeList.push("INAPP-SCHEMA-CODE2");            
+            let divList = [];
+            divList.push("divView");
+            divList.push("divViewTwo");
+            showInApp(inAppCodeList[0], divList[0]);
+            showInApp(inAppCodeList[1], divList[1]);
+        }
+
+        function showInApp(inAppCode, divId) {
+            indigitall.showInApp(inAppCode, divId, (inApp, div) => {
+            }, (error) => {
+                Console.log(error);
+            }, (inApp, div) => {
+            });
+        }
+
+        getInApp();
+    </script>
+
+</body>
+
+</html>

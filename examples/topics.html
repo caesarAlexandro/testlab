@@ -1,0 +1,80 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet"
+        integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC" crossorigin="anonymous">
+    <link rel="icon" type="image/png" href="/images/favicon.png">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+    <title>Indigitall JS Examples</title>
+</head>
+
+<style>
+    ul {
+        list-style: none;
+    }
+</style>
+
+<body>
+    <div id="root">
+        <nav class="navbar navbar-expand-sm navbar-dark bg-dark">
+            <div class="container">
+                <a href="/#" class="navbar-brand mb-0 h1">
+                    <button type="button" class="btn btn-light">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor"
+                            class="bi bi-chevron-left" viewBox="0 0 16 16">
+                            <path fill-rule="evenodd"
+                                d="M11.354 1.646a.5.5 0 0 1 0 .708L5.707 8l5.647 5.646a.5.5 0 0 1-.708.708l-6-6a.5.5 0 0 1 0-.708l6-6a.5.5 0 0 1 .708 0z" />
+                        </svg>
+                    </button>
+                    Indigitall Examples - Topics
+                </a>
+            </div>
+        </nav>
+        <div id="main-page" style="margin: 16px;">
+            <div>
+                <h2>Topics:</h2>
+                <ul class="topics"></ul>
+            </div>
+        </div>
+    </div>
+
+    <script src="/indigitall/sdk.min.js"></script>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.bundle.min.js"
+        integrity="sha384-MrcW6ZMFYlzcLA8Nl+NtUVF0sA7MsXsP1UyJoMp4YLEuNSfAP+JcXn/tWtIaxVXM"
+        crossorigin="anonymous"></script>
+
+    <script>
+        function getTopics() {
+            window.indigitall.topicsList((topics) => {
+                createTable(topics)
+            }, (error) => {
+                console.log(error);
+            });
+        }
+
+        function createTable(topics) {
+            topics.forEach((topic) => {
+                $("ul.topics").append(`<li><input type="checkbox"
+        id="${topic.code}"
+        ${topic.subscribed ? 'checked' : ''}/>
+        ${topic.name}</li>`)
+            });
+
+            $('ul.topics li input[type="checkbox"]').click((e) => {
+                if (e.target.checked === true) {
+                    indigitall.topicsSubscribe([e.target.id]);
+                } else {
+                    indigitall.topicsUnsubscribe([e.target.id])
+                }
+            })
+        }
+        getTopics();
+    </script>
+
+</body>
+
+</html>
